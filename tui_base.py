@@ -73,7 +73,7 @@ class TextualApp(App):
     BINDINGS = [
             # be careful with enabling priorty
             # that may negatively impact typing on the first (but not main) screen w/ input
-            Binding("d", "custom_dark", "Toggle Darkness"),
+            Binding("c", "custom_dark", "Color Toggle"),
             Binding("s", "custom_screenshot", "Screenshot"),
             Binding("q", "request_quit", "Quit")
             ]
@@ -104,12 +104,14 @@ class TextualApp(App):
         """When the user presses the quit keybind, show the quit confirmation screen"""
         self.push_screen('quit_screen')
 
+    def get_screenshot_name(self) -> str:
+        '''Using the current date and time, return a name for the requested screenshot'''
+        return f'screenshot_{datetime.now().isoformat().replace(":", "_")}.svg'
+
     async def action_custom_screenshot(self, screen_dir: str = '/tmp') -> None:
         """Action that fires when the user presses 's' for a screenshot"""
         # construct the screenshot elements: name (w/ ISO timestamp) + path
-        screen_name = ('screenshot_' +
-                       datetime.now().isoformat().replace(":", "_") +
-                       '.svg')
+        screen_name = self.get_screenshot_name()
         # take the screenshot, recording the path for logging/notification
         outpath = self.save_screenshot(path=screen_dir, filename=screen_name)
         # construct the log/notification message, then show it
@@ -123,9 +125,8 @@ class TextualApp(App):
                 yield self.text_log
             with TabPane("About", id="tab_about"):
                 yield Vertical(
-                        Label(metadata['title'] + ' v' + metadata['version'] + '\n' +
-                              metadata['description'] + '\n\n' +
-                              'by [italic]' +  metadata['author'] + '[/]', markup=True )
+                        Label(f"{metadata['title']} v{metadata['version']}\n{metadata['description']}\n\nby [italic]{metadata['author']}[/]",
+                              markup=True )
                         )
         yield Footer()
 
