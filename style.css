@@ -1,0 +1,114 @@
+/* for colors, see: https://textual.textualize.io/guide/design/#theme-reference */
+
+TextualApp {
+/*    box-sizing: content-box;*/
+        background: $panel;
+        height: 100%;
+        width: 100%;
+/*        min-width: 50;*/
+}
+
+QuitScreen {
+        align: center middle;
+}
+
+.tabbed_container {
+        background: $panel;
+}
+
+.dialog {
+    grid-size: 2;
+    grid-gutter: 1 2;
+    grid-rows: 1fr 3;
+    padding: 0 1;
+    width: 60;
+    height: 11;
+    border: thick $background 80%;
+    background: $surface;
+}
+
+#question {
+    column-span: 2;
+    height: 1fr;
+    width: 1fr;
+    content-align: center middle;
+}
+
+Button {
+    width: 1fr;
+}
+
+.logs {
+    height: 1fr;
+    background: $background;
+}
+
+.stat_table {
+    width: 100%;
+}
+
+.tab_graphs {
+    layout: grid;
+}
+
+.graph_section {
+    box-sizing: content-box;
+}
+
+Container {
+    height: 1fr;
+}
+
+TabbedContent {
+/*    box-sizing: content-box;*/
+    height: 1fr;
+}
+
+TabPane {
+    padding: 0 1;
+    border-bottom: heavy $primary-background;
+    border-subtitle-color: $text-disabled;
+    height: 1fr;
+}
+
+Notification {
+    dock: bottom;
+    layer: notification;
+    width: auto;
+    margin: 2 4;
+    padding: 1 2;
+    background: $panel;
+    color: $text;
+    height: auto;
+}
+
+Header {
+    dock: top;
+    content-align: center middle;
+    background: $panel;
+}
+
+Footer {
+    background: #073b61;
+    dock: bottom;
+    height: 1;
+}
+
+.footer--highlight {
+    background: #81a1c1;
+    color: #434c5e;
+}
+
+.footer--highlight-key {
+    background: #88c0d0;
+    color: #434c5e;
+}
+
+.footer--key {
+    background: #004578;
+}
+
+ScrollBar {
+    border-top: inner $panel-lighten-3;
+    border-bottom: inner $panel-lighten-3;
+}
