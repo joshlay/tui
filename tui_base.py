@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """TUI backup utility using Textual"""
 import os
-from time import strftime
+from datetime import datetime
 from textual import work
 from textual.app import App, ComposeResult
 from textual.binding import Binding
@@ -74,6 +74,7 @@ class TextualApp(App):
             # be careful with enabling priorty
             # that may negatively impact typing on the first (but not main) screen w/ input
             Binding("d", "custom_dark", "Toggle Darkness"),
+            Binding("s", "custom_screenshot", "Screenshot"),
             Binding("q", "request_quit", "Quit")
             ]
     SCREENS = {"quit_screen": QuitScreen()}
@@ -103,6 +104,17 @@ class TextualApp(App):
         """When the user presses the quit keybind, show the quit confirmation screen"""
         self.push_screen('quit_screen')
 
+    async def action_custom_screenshot(self, screen_dir: str = '/tmp') -> None:
+        """Action that fires when the user presses 's' for a screenshot"""
+        # construct the screenshot elements: name (w/ ISO timestamp) + path
+        screen_name = ('screenshot_' +
+                       datetime.now().isoformat().replace(":", "_") +
+                       '.svg')
+        # take the screenshot, recording the path for logging/notification
+        outpath = self.save_screenshot(path=screen_dir, filename=screen_name)
+        # construct the log/notification message, then show it
+        self.update_log(f"[bold]Screenshot saved to [green]'{outpath}'", notify=True)
+
     def compose(self) -> ComposeResult:
         """Craft the main window/widgets"""
         yield Header(show_clock=True)
@@ -125,7 +137,7 @@ class TextualApp(App):
     def update_log(self, message: str, timestamp: bool = True, notify: bool = False) -> None:
         '''Write to the main TextLog widget, optional timestamps'''
         if timestamp:
-            self.text_log.write(strftime("%b %d %H:%M:%S") + ': ' + message)
+            self.text_log.write(datetime.now().strftime("%b %d %H:%M:%S") + ': ' + message)
         else:
             self.text_log.write(message)
         if notify:
