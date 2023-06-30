@@ -25,7 +25,9 @@ metadata = {
     'author': 'Josh Lay <me+fedora@jlay.io>',
     'creation_date': '2023-06-29',
     'version': '1.0.0',
-    'description': 'This is a basic Textual TUI application.  Used as the foundation for other projects'
+    'description': '''This is a basic Textual TUI application.
+
+Used as the foundation for other projects'''
 }
 
 class Notification(Static):
@@ -124,8 +126,9 @@ class TextualApp(App):
                 yield self.text_log
             with TabPane("About", id="tab_about"):
                 yield Vertical(
-                        Label(f"{metadata['title']} v{metadata['version']}\n{metadata['description']}\n\nby [italic]{metadata['author']}[/]",
-                              markup=True )
+                        Label(f"{metadata['title']} v{metadata['version']}"),
+                        Label(f"{metadata['description']}"),
+                        Label(f"by [italic]{metadata['author']}[/]", markup=True)
                         )
         yield Footer()
 
