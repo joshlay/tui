@@ -70,13 +70,12 @@ class TextualApp(App):
 
     TITLE = metadata['title']
 
-    BINDINGS = [
-            # be careful with enabling priorty
-            # that may negatively impact typing on the first (but not main) screen w/ input
+    BINDINGS = (
+            # be careful with enabling priority; will steal focus from input fields
             Binding("c", "custom_dark", "Color Toggle"),
             Binding("s", "custom_screenshot", "Screenshot"),
             Binding("q", "request_quit", "Quit")
-            ]
+            )
     SCREENS = {"quit_screen": QuitScreen()}
 
     selected_path = None
