@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""TUI backup utility using Textual"""
+"""Base Textual Application"""
 import os
 from datetime import datetime
 from textual import work
@@ -12,10 +12,9 @@ from textual.widgets import (
         Footer,
         Header,
         Label,
-        Static,
         TabbedContent,
         TabPane,
-        TextLog,
+        RichLog,
         )
 from textual.worker import Worker, WorkerState
 
@@ -29,20 +28,6 @@ metadata = {
 
 Used as the foundation for other projects'''
 }
-
-class Notification(Static):
-    '''Self-removing notification widget'''
-
-    def on_mount(self) -> None:
-        '''On the creation/display of the notification...
-
-        Creates a timer to remove itself in 3 seconds'''
-        self.set_timer(3, self.remove)
-
-    def on_click(self) -> None:
-        '''Fires when notification is clicked, removes the widget'''
-        self.remove()
-
 
 class QuitScreen(ModalScreen):
     """Screen with a dialog to quit."""
@@ -89,7 +74,7 @@ class TextualApp(App):
         super().__init__(*args, **kwargs)
         self.tabbed_container = TabbedContent(id="tabbed_content_main",
                                               classes='tabbed_container')
-        self.text_log = TextLog(id="main_textlog",
+        self.text_log = RichLog(id="main_textlog",
                                 markup=True,
                                 highlight=True,
                                 classes='logs')
@@ -116,7 +101,7 @@ class TextualApp(App):
         # take the screenshot, recording the path for logging/notification
         outpath = self.save_screenshot(path=screen_dir, filename=screen_name)
         # construct the log/notification message, then show it
-        self.update_log(f"[bold]Screenshot saved to [green]'{outpath}'", notify=True)
+        self.update_log(f"[bold]Screenshot saved: [green]'{outpath}'", notify=True)
 
     def compose(self) -> ComposeResult:
         """Craft the main window/widgets"""
@@ -134,17 +119,16 @@ class TextualApp(App):
 
     def on_mount(self) -> None:
         '''Fires when widget 'mounted', behaves like on-first-showing'''
-        message = f"Hello, {os.getlogin()} :)"
-        self.screen.mount(Notification(message))
+        self.update_log(f"Hello, {os.getlogin()} :)", notify=True)
 
     def update_log(self, message: str, timestamp: bool = True, notify: bool = False) -> None:
-        '''Write to the main TextLog widget, optional timestamps'''
+        '''Write to the main RichLog widget, optional timestamps'''
         if timestamp:
             self.text_log.write(datetime.now().strftime("%b %d %H:%M:%S") + ': ' + message)
         else:
             self.text_log.write(message)
         if notify:
-            self.screen.mount(Notification(message, markup=True))
+            self.notify(message)
 
     def on_worker_state_changed(self, event: Worker.StateChanged) -> None:
         """Called when the worker state changes."""

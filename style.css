@@ -71,17 +71,6 @@ TabPane {
     height: 1fr;
 }
 
-Notification {
-    dock: bottom;
-    layer: notification;
-    width: auto;
-    margin: 2 4;
-    padding: 1 2;
-    background: $panel;
-    color: $text;
-    height: auto;
-}
-
 Header {
     dock: top;
     content-align: center middle;
