@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Base Textual Application"""
-import os
+from os import getlogin
 from datetime import datetime
 from textual import work
 from textual.app import App, ComposeResult
@@ -23,9 +23,7 @@ metadata = {
     'author': 'Josh Lay <me+fedora@jlay.io>',
     'creation_date': '2023-06-29',
     'version': '1.0.0',
-    'description': '''This is a basic Textual TUI application.
-
-Used as the foundation for other projects'''
+    'description': '''This is a basic Textual TUI. Used as the foundation for other projects'''
 }
 
 class QuitScreen(ModalScreen):
@@ -115,7 +113,7 @@ class TextualApp(App):
 
     async def on_mount(self) -> None:
         """Fires when widget 'mounted', behaves like on-first-showing"""
-        await self.update_log(f"Hello, {os.getlogin()} :)", notify=True)
+        await self.update_log(f"Hello, {getlogin()} :)", notify=True)
 
     async def update_log(self, message: str, timestamp: bool = True, notify: bool = False) -> None:
         """Write to the main RichLog widget, optional timestamps and notifications"""
