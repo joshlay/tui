@@ -16,7 +16,6 @@ from textual.widgets import (
         TabPane,
         RichLog,
         )
-from textual.worker import Worker, WorkerState
 
 # 'package' (script) meta
 metadata = {
@@ -30,7 +29,7 @@ Used as the foundation for other projects'''
 }
 
 class QuitScreen(ModalScreen):
-    """Screen with a dialog to quit."""
+    """Screen with a dialog to quit. Shown when user presses keybind"""
 
     def compose(self) -> ComposeResult:
         yield Grid(
@@ -50,7 +49,7 @@ class QuitScreen(ModalScreen):
 
 
 class TextualApp(App):
-    """Textual 'app' for this utility"""
+    """Defines the main Textual 'app'"""
 
     # set the path to the stylesheet, relative is fine
     CSS_PATH = 'style.css'
@@ -81,27 +80,24 @@ class TextualApp(App):
 
     @work(exclusive=True)
     async def action_custom_dark(self) -> None:
-        """An action to toggle dark mode.
-
-        Wraps 'action_toggle_dark' with our logging"""
+        """An action to toggle dark mode. Wraps 'action_toggle_dark' with our logging"""
         self.app.dark = not self.app.dark
+        await self.update_log(f'[bold]Dark mode: {self.dark}', notify=True)
 
     def action_request_quit(self) -> None:
         """When the user presses the quit keybind, show the quit confirmation screen"""
         self.push_screen('quit_screen')
 
     def get_screenshot_name(self) -> str:
-        '''Using the current date and time, return a name for the requested screenshot'''
+        """Using the current date and time, return a name for the requested screenshot"""
         return f'screenshot_{datetime.now().isoformat().replace(":", "_")}.svg'
 
     async def action_custom_screenshot(self, screen_dir: str = '/tmp') -> None:
         """Action that fires when the user presses 's' for a screenshot"""
-        # construct the screenshot elements: name (w/ ISO timestamp) + path
-        screen_name = self.get_screenshot_name()
         # take the screenshot, recording the path for logging/notification
-        outpath = self.save_screenshot(path=screen_dir, filename=screen_name)
+        outpath = self.save_screenshot(path=screen_dir, filename=self.get_screenshot_name())
         # construct the log/notification message, then show it
-        self.update_log(f"[bold]Screenshot saved: [green]'{outpath}'", notify=True)
+        await self.update_log(f"[bold]Screenshot saved: [green]'{outpath}'", notify=True)
 
     def compose(self) -> ComposeResult:
         """Craft the main window/widgets"""
@@ -117,25 +113,18 @@ class TextualApp(App):
                         )
         yield Footer()
 
-    def on_mount(self) -> None:
-        '''Fires when widget 'mounted', behaves like on-first-showing'''
-        self.update_log(f"Hello, {os.getlogin()} :)", notify=True)
+    async def on_mount(self) -> None:
+        """Fires when widget 'mounted', behaves like on-first-showing"""
+        await self.update_log(f"Hello, {os.getlogin()} :)", notify=True)
 
-    def update_log(self, message: str, timestamp: bool = True, notify: bool = False) -> None:
-        '''Write to the main RichLog widget, optional timestamps'''
+    async def update_log(self, message: str, timestamp: bool = True, notify: bool = False) -> None:
+        """Write to the main RichLog widget, optional timestamps and notifications"""
         if timestamp:
             self.text_log.write(datetime.now().strftime("%b %d %H:%M:%S") + ': ' + message)
         else:
             self.text_log.write(message)
         if notify:
             self.notify(message)
-
-    def on_worker_state_changed(self, event: Worker.StateChanged) -> None:
-        """Called when the worker state changes."""
-        # log dark mode being toggled; when the worker event shows success
-        if event.worker.name == 'action_custom_dark':
-            if event.state == WorkerState.SUCCESS:
-                self.update_log(f'[bold]Dark mode: {self.dark}', notify=True)
 
 
 if __name__ == "__main__":
